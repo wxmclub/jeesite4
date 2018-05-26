@@ -18,7 +18,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Comment;
@@ -37,11 +36,13 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jeesite.common.codec.EncodeUtils;
 import com.jeesite.common.collect.ListUtils;
+import com.jeesite.common.lang.ObjectUtils;
+import com.jeesite.common.lang.StringUtils;
 import com.jeesite.common.reflect.ReflectUtils;
 import com.jeesite.common.utils.excel.annotation.ExcelField;
 import com.jeesite.common.utils.excel.annotation.ExcelField.Align;
-import com.jeesite.common.utils.excel.annotation.ExcelFields;
 import com.jeesite.common.utils.excel.annotation.ExcelField.Type;
+import com.jeesite.common.utils.excel.annotation.ExcelFields;
 
 /**
  * 导出Excel文件（导出“XLSX”格式，支持大数据量导出   @see org.apache.poi.ss.SpreadsheetVersion）
@@ -95,25 +96,37 @@ public class ExcelExport {
 	 * @param groups 导入分组
 	 */
 	public ExcelExport(String title, Class<?> cls, Type type, String... groups){
-		this(null, title, cls, type, groups);
+		this(null, null, title, cls, type, groups);
 	}
 	
 	/**
 	 * 构造函数
-	 * @param wb 工作簿对象，支持多个Sheet，通过ExcelExport.createWorkbook()创建
-	 * @param sheetName，指定Sheet名称
+	 * @param sheetName 指定Sheet名称
 	 * @param title 表格标题，传“空值”，表示无标题
 	 * @param cls 实体对象，通过annotation.ExportField获取标题
 	 * @param type 导出类型（1:导出数据；2：导出模板）
 	 * @param groups 导入分组
 	 */
-	public ExcelExport(Workbook wb, String title, Class<?> cls, Type type, String... groups){
+	public ExcelExport(String sheetName, String title, Class<?> cls, Type type, String... groups){
+		this(null, sheetName, title, cls, type, groups);
+	}
+	
+	/**
+	 * 构造函数
+	 * @param wb 指定现有工作簿对象
+	 * @param sheetName 指定Sheet名称
+	 * @param title 表格标题，传“空值”，表示无标题
+	 * @param cls 实体对象，通过annotation.ExportField获取标题
+	 * @param type 导出类型（1:导出数据；2：导出模板）
+	 * @param groups 导入分组
+	 */
+	public ExcelExport(Workbook wb, String sheetName, String title, Class<?> cls, Type type, String... groups){
 		if (wb != null){
 			this.wb = wb;
 		}else{
 			this.wb = createWorkbook();
 		}
-		this.createSheet(null, title, cls, type, groups);
+		this.createSheet(sheetName, title, cls, type, groups);
 	}
 	
 	/**
@@ -121,33 +134,51 @@ public class ExcelExport {
 	 * @param title 表格标题，传“空值”，表示无标题
 	 * @param headerList 表头数组
 	 */
-	public ExcelExport(String title, List<String> headerList) {
-		this(null, null, title, headerList);
+	public ExcelExport(String title, List<String> headerList, List<Integer> headerWidthList) {
+		this(null, null, title, headerList, headerWidthList);
 	}
 	
 	/**
 	 * 构造函数
-	 * @param wb 工作簿对象，支持多个Sheet，通过ExcelExport.createWorkbook()创建
+	 * @param sheetName 指定Sheet名称
+	 * @param title 表格标题，传“空值”，表示无标题
+	 * @param headerList 表头数组
+	 */
+	public ExcelExport(String sheetName, String title, List<String> headerList, List<Integer> headerWidthList) {
+		this(null, sheetName, title, headerList, headerWidthList);
+	}
+	
+	/**
+	 * 构造函数
+	 * @param wb 指定现有工作簿对象
 	 * @param sheetName，指定Sheet名称
 	 * @param title 表格标题，传“空值”，表示无标题
 	 * @param headerList 表头列表
 	 */
-	public ExcelExport(Workbook wb, String sheetName, String title, List<String> headerList) {
+	public ExcelExport(Workbook wb, String sheetName, String title, List<String> headerList, List<Integer> headerWidthList) {
 		if (wb != null){
 			this.wb = wb;
 		}else{
 			this.wb = createWorkbook();
 		}
-		this.createSheet(sheetName, title, headerList, null);
+		this.createSheet(sheetName, title, headerList, headerWidthList);
 	}
 	
 	/**
 	 * 创建一个工作簿
 	 */
-	private Workbook createWorkbook(){
+	public Workbook createWorkbook(){
 		return new SXSSFWorkbook(500);
 	}
 
+	/**
+	 * 获取当前工作薄
+	 * @author ThinkGem
+	 */
+	public Workbook getWorkbook() {
+		return wb;
+	}
+	
 	/**
 	 * 创建工作表
 	 * @param sheetName，指定Sheet名称
@@ -238,15 +269,15 @@ public class ExcelExport {
 
 	/**
 	 * 创建工作表
-	 * @param sheetName，指定Sheet名称
+	 * @param sheetName 指定Sheet名称
 	 * @param title 表格标题，传“空值”，表示无标题
-	 * @param cls 实体对象，通过annotation.ExportField获取标题
-	 * @param type 导出类型（1:导出数据；2：导出模板）
-	 * @param groups 导入分组
+	 * @param headerList 表头字段设置
+	 * @param headerWidthList 表头字段宽度设置
 	 */
 	public void createSheet(String sheetName, String title, List<String> headerList, List<Integer> headerWidthList) {
 		this.sheet = wb.createSheet(StringUtils.defaultString(sheetName, StringUtils.defaultString(title, "Sheet1")));
 		this.styles = createStyles(wb);
+		this.rownum = 0;
 		// Create title
 		if (StringUtils.isNotBlank(title)){
 			Row titleRow = sheet.createRow(rownum++);
@@ -296,28 +327,8 @@ public class ExcelExport {
 				sheet.setColumnWidth(i, colWidth);  
 			}
 		}
-		log.debug("Create sheet {0} success.", sheetName);
+		log.debug("Create sheet {} success.", sheetName);
 	}
-	
-//	/**
-//	 * 构造函数
-//	 * @param title 表格标题，传“空值”，表示无标题
-//	 * @param headers 表头数组
-//	 */
-//	public ExcelExport(String title, List<String> headerList) {
-//		this(null, null, title, headerList);
-//	}
-//	
-//	/**
-//	 * 构造函数
-//	 * @param wb 工作簿对象，支持多个Sheet，通过ExcelExport.createWorkbook()创建
-//	 * @param sheetName，指定Sheet名称
-//	 * @param title 表格标题，传“空值”，表示无标题
-//	 * @param headerList 表头列表
-//	 */
-//	public ExcelExport(Workbook wb, String sheetName, String title, List<String> headerList) {
-//		initialize(wb, sheetName, title, headerList, null);
-//	}
 	
 	/**
 	 * 创建表格样式
@@ -464,7 +475,7 @@ public class ExcelExport {
 //			}
 		} catch (Exception ex) {
 			log.info("Set cell value ["+row.getRowNum()+","+column+"] error: " + ex.toString());
-			cell.setCellValue(val.toString());
+			cell.setCellValue(ObjectUtils.toString(val));
 		}
 		return cell;
 	}
@@ -496,7 +507,7 @@ public class ExcelExport {
 					if (StringUtils.isNotBlank(ef.dictType())){
 						Class<?> dictUtils = Class.forName("com.jeesite.modules.sys.utils.DictUtils");
 						val = dictUtils.getMethod("getDictLabel", String.class, String.class,
-									String.class).invoke(null, val==null?"":val.toString(), ef.dictType(), "");
+									String.class).invoke(null, ef.dictType(), val==null?"":val.toString(), "");
 						//val = DictUtils.getDictLabel(val==null?"":val.toString(), ef.dictType(), "");
 					}
 				}catch(Exception ex) {
@@ -576,23 +587,24 @@ public class ExcelExport {
 //	 */
 //	public static void main(String[] args) throws Throwable {
 //		
+//		// 初始化表头
 //		List<String> headerList = ListUtils.newArrayList();
 //		for (int i = 1; i <= 10; i++) {
 //			headerList.add("表头"+i);
 //		}
-//		
-//		List<String> dataRowList = ListUtils.newArrayList();
+//
+//		// 初始化数据集
+//		List<String> rowList = ListUtils.newArrayList();
 //		for (int i = 1; i <= headerList.size(); i++) {
-//			dataRowList.add("数据"+i);
+//			rowList.add("数据"+i);
 //		}
-//		
 //		List<List<String>> dataList = ListUtils.newArrayList();
 //		for (int i = 1; i <=100; i++) {
-//			dataList.add(dataRowList);
+//			dataList.add(rowList);
 //		}
-//
-//		ExcelExport ee = new ExcelExport("表格标题", headerList);
 //		
+//		// 创建一个Sheet表，并导入数据
+//		ExcelExport ee = new ExcelExport("表格1", "表格标题1", headerList, null);
 //		for (int i = 0; i < dataList.size(); i++) {
 //			Row row = ee.addRow();
 //			for (int j = 0; j < dataList.get(i).size(); j++) {
@@ -600,8 +612,19 @@ public class ExcelExport {
 //			}
 //		}
 //		
+//		// 再创建一个Sheet表，并导入数据
+//		ee.createSheet("表格2", "表格标题2", headerList, null);
+//		for (int i = 0; i < dataList.size(); i++) {
+//			Row row = ee.addRow();
+//			for (int j = 0; j < dataList.get(i).size(); j++) {
+//				ee.addCell(row, j, dataList.get(i).get(j)+"2");
+//			}
+//		}
+//		
+//		// 输出到文件
 //		ee.writeFile("target/export.xlsx");
 //
+//		// 清理销毁
 //		ee.dispose();
 //		
 //		log.debug("Export success.");

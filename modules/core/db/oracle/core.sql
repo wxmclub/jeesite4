@@ -24,7 +24,7 @@ DROP TABLE js_sys_module CASCADE CONSTRAINTS;
 DROP TABLE js_sys_msg_inner_record CASCADE CONSTRAINTS;
 DROP TABLE js_sys_msg_inner CASCADE CONSTRAINTS;
 DROP TABLE js_sys_msg_push CASCADE CONSTRAINTS;
-DROP TABLE js_sys_msg_push_wait CASCADE CONSTRAINTS;
+DROP TABLE js_sys_msg_pushed CASCADE CONSTRAINTS;
 DROP TABLE js_sys_msg_template CASCADE CONSTRAINTS;
 DROP TABLE js_sys_office CASCADE CONSTRAINTS;
 DROP TABLE js_sys_post CASCADE CONSTRAINTS;
@@ -41,12 +41,12 @@ CREATE TABLE js_sys_area
 (
 	area_code varchar2(100) NOT NULL,
 	parent_code varchar2(64) NOT NULL,
-	parent_codes varchar2(2000) NOT NULL,
+	parent_codes varchar2(1000) NOT NULL,
 	tree_sort number(10) NOT NULL,
-	tree_sorts varchar2(1200) NOT NULL,
+	tree_sorts varchar2(1000) NOT NULL,
 	tree_leaf char(1) NOT NULL,
 	tree_level number(4) NOT NULL,
-	tree_names varchar2(2000) NOT NULL,
+	tree_names varchar2(1000) NOT NULL,
 	area_name nvarchar2(100) NOT NULL,
 	area_type char(1),
 	status char(1) DEFAULT '0' NOT NULL,
@@ -64,12 +64,12 @@ CREATE TABLE js_sys_company
 (
 	company_code varchar2(64) NOT NULL,
 	parent_code varchar2(64) NOT NULL,
-	parent_codes varchar2(2000) NOT NULL,
+	parent_codes varchar2(1000) NOT NULL,
 	tree_sort number(10) NOT NULL,
-	tree_sorts varchar2(1200) NOT NULL,
+	tree_sorts varchar2(1000) NOT NULL,
 	tree_leaf char(1) NOT NULL,
 	tree_level number(4) NOT NULL,
-	tree_names varchar2(2000) NOT NULL,
+	tree_names varchar2(1000) NOT NULL,
 	view_code varchar2(100) NOT NULL,
 	company_name nvarchar2(200) NOT NULL,
 	full_name nvarchar2(200) NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE js_sys_config
 	id varchar2(64) NOT NULL,
 	config_name nvarchar2(100) NOT NULL,
 	config_key varchar2(100) NOT NULL,
-	config_value nvarchar2(2000) NOT NULL,
+	config_value nvarchar2(1000) NOT NULL,
 	is_sys char(1) NOT NULL,
 	create_by varchar2(64) NOT NULL,
 	create_date timestamp NOT NULL,
@@ -137,12 +137,12 @@ CREATE TABLE js_sys_dict_data
 (
 	dict_code varchar2(64) NOT NULL,
 	parent_code varchar2(64) NOT NULL,
-	parent_codes varchar2(2000) NOT NULL,
+	parent_codes varchar2(1000) NOT NULL,
 	tree_sort number(10) NOT NULL,
-	tree_sorts varchar2(1200) NOT NULL,
+	tree_sorts varchar2(1000) NOT NULL,
 	tree_leaf char(1) NOT NULL,
 	tree_level number(4) NOT NULL,
-	tree_names varchar2(2000) NOT NULL,
+	tree_names varchar2(1000) NOT NULL,
 	dict_label nvarchar2(100) NOT NULL,
 	dict_value varchar2(100) NOT NULL,
 	dict_type varchar2(100) NOT NULL,
@@ -337,6 +337,7 @@ CREATE TABLE js_sys_log
 	user_agent nvarchar2(500),
 	device_name varchar2(100),
 	browser_name varchar2(100),
+	execute_time number(19),
 	corp_code varchar2(64) DEFAULT '0' NOT NULL,
 	corp_name nvarchar2(100) DEFAULT 'JeeSite' NOT NULL,
 	PRIMARY KEY (id)
@@ -348,19 +349,19 @@ CREATE TABLE js_sys_menu
 (
 	menu_code varchar2(64) NOT NULL,
 	parent_code varchar2(64) NOT NULL,
-	parent_codes varchar2(2000) NOT NULL,
+	parent_codes varchar2(1000) NOT NULL,
 	tree_sort number(10) NOT NULL,
-	tree_sorts varchar2(1200) NOT NULL,
+	tree_sorts varchar2(1000) NOT NULL,
 	tree_leaf char(1) NOT NULL,
 	tree_level number(4) NOT NULL,
-	tree_names varchar2(2000) NOT NULL,
+	tree_names varchar2(1000) NOT NULL,
 	menu_name varchar2(100) NOT NULL,
 	menu_type char(1) NOT NULL,
-	menu_href varchar2(2000),
+	menu_href varchar2(1000),
 	menu_target varchar2(20),
 	menu_icon varchar2(100),
 	menu_color varchar2(50),
-	permission varchar2(2000),
+	permission varchar2(1000),
 	weight number(4),
 	is_show char(1) NOT NULL,
 	sys_code varchar2(64) NOT NULL,
@@ -483,8 +484,8 @@ CREATE TABLE js_sys_msg_push
 );
 
 
--- 消息待推送表
-CREATE TABLE js_sys_msg_push_wait
+-- 消息已推送表
+CREATE TABLE js_sys_msg_pushed
 (
 	id varchar2(64) NOT NULL,
 	msg_type varchar2(16) NOT NULL,
@@ -519,7 +520,7 @@ CREATE TABLE js_sys_msg_template
 	module_code varchar2(64),
 	tpl_key varchar2(100) NOT NULL,
 	tpl_name nvarchar2(100) NOT NULL,
-	tpl_type char(1) NOT NULL,
+	tpl_type varchar2(16) NOT NULL,
 	tpl_content clob NOT NULL,
 	status char(1) DEFAULT '0' NOT NULL,
 	create_by varchar2(64) NOT NULL,
@@ -536,12 +537,12 @@ CREATE TABLE js_sys_office
 (
 	office_code varchar2(64) NOT NULL,
 	parent_code varchar2(64) NOT NULL,
-	parent_codes varchar2(2000) NOT NULL,
+	parent_codes varchar2(1000) NOT NULL,
 	tree_sort number(10) NOT NULL,
-	tree_sorts varchar2(1200) NOT NULL,
+	tree_sorts varchar2(1000) NOT NULL,
 	tree_leaf char(1) NOT NULL,
 	tree_level number(4) NOT NULL,
-	tree_names varchar2(2000) NOT NULL,
+	tree_names varchar2(1000) NOT NULL,
 	view_code varchar2(100) NOT NULL,
 	office_name nvarchar2(100) NOT NULL,
 	full_name varchar2(200) NOT NULL,
@@ -655,7 +656,7 @@ CREATE TABLE js_sys_user
 	mobile varchar2(100),
 	phone varchar2(100),
 	sex char(1),
-	avatar varchar2(2000),
+	avatar varchar2(1000),
 	sign nvarchar2(200),
 	wx_openid varchar2(100),
 	mobile_imei varchar2(100),
@@ -665,7 +666,7 @@ CREATE TABLE js_sys_user
 	mgr_type char(1) NOT NULL,
 	pwd_security_level number(1),
 	pwd_update_date timestamp,
-	pwd_update_record varchar2(2000),
+	pwd_update_record varchar2(1000),
 	pwd_question varchar2(200),
 	pwd_question_answer varchar2(200),
 	pwd_question_2 varchar2(200),
@@ -815,16 +816,16 @@ CREATE INDEX idx_sys_msg_push_rs ON js_sys_msg_push (read_status);
 CREATE INDEX idx_sys_msg_push_bk ON js_sys_msg_push (biz_key);
 CREATE INDEX idx_sys_msg_push_bt ON js_sys_msg_push (biz_type);
 CREATE INDEX idx_sys_msg_push_imp ON js_sys_msg_push (is_merge_push);
-CREATE INDEX idx_sys_msg_pushw_type ON js_sys_msg_push_wait (msg_type);
-CREATE INDEX idx_sys_msg_pushw_rc ON js_sys_msg_push_wait (receive_code);
-CREATE INDEX idx_sys_msg_pushw_uc ON js_sys_msg_push_wait (receive_user_code);
-CREATE INDEX idx_sys_msg_pushw_suc ON js_sys_msg_push_wait (send_user_code);
-CREATE INDEX idx_sys_msg_pushw_pd ON js_sys_msg_push_wait (plan_push_date);
-CREATE INDEX idx_sys_msg_pushw_ps ON js_sys_msg_push_wait (push_status);
-CREATE INDEX idx_sys_msg_pushw_rs ON js_sys_msg_push_wait (read_status);
-CREATE INDEX idx_sys_msg_pushw_bk ON js_sys_msg_push_wait (biz_key);
-CREATE INDEX idx_sys_msg_pushw_bt ON js_sys_msg_push_wait (biz_type);
-CREATE INDEX idx_sys_msg_pushw_imp ON js_sys_msg_push_wait (is_merge_push);
+CREATE INDEX idx_sys_msg_pushed_type ON js_sys_msg_pushed (msg_type);
+CREATE INDEX idx_sys_msg_pushed_rc ON js_sys_msg_pushed (receive_code);
+CREATE INDEX idx_sys_msg_pushed_uc ON js_sys_msg_pushed (receive_user_code);
+CREATE INDEX idx_sys_msg_pushed_suc ON js_sys_msg_pushed (send_user_code);
+CREATE INDEX idx_sys_msg_pushed_pd ON js_sys_msg_pushed (plan_push_date);
+CREATE INDEX idx_sys_msg_pushed_ps ON js_sys_msg_pushed (push_status);
+CREATE INDEX idx_sys_msg_pushed_rs ON js_sys_msg_pushed (read_status);
+CREATE INDEX idx_sys_msg_pushed_bk ON js_sys_msg_pushed (biz_key);
+CREATE INDEX idx_sys_msg_pushed_bt ON js_sys_msg_pushed (biz_type);
+CREATE INDEX idx_sys_msg_pushed_imp ON js_sys_msg_pushed (is_merge_push);
 CREATE INDEX idx_sys_msg_tpl_key ON js_sys_msg_template (tpl_key);
 CREATE INDEX idx_sys_msg_tpl_type ON js_sys_msg_template (tpl_type);
 CREATE INDEX idx_sys_msg_tpl_status ON js_sys_msg_template (status);
@@ -1081,6 +1082,7 @@ COMMENT ON COLUMN js_sys_log.exception_info IS '异常信息';
 COMMENT ON COLUMN js_sys_log.user_agent IS '用户代理';
 COMMENT ON COLUMN js_sys_log.device_name IS '设备名称/操作系统';
 COMMENT ON COLUMN js_sys_log.browser_name IS '浏览器名称';
+COMMENT ON COLUMN js_sys_log.execute_time IS '执行时间';
 COMMENT ON COLUMN js_sys_log.corp_code IS '归属集团Code';
 COMMENT ON COLUMN js_sys_log.corp_name IS '归属集团Name';
 COMMENT ON TABLE js_sys_menu IS '菜单表';
@@ -1193,29 +1195,29 @@ COMMENT ON COLUMN js_sys_msg_push.push_status IS '推送状态（0未推送 1成
 COMMENT ON COLUMN js_sys_msg_push.push_date IS '推送时间';
 COMMENT ON COLUMN js_sys_msg_push.read_status IS '读取状态（0未送达 1未读 2已读）';
 COMMENT ON COLUMN js_sys_msg_push.read_date IS '读取时间';
-COMMENT ON TABLE js_sys_msg_push_wait IS '消息待推送表';
-COMMENT ON COLUMN js_sys_msg_push_wait.id IS '编号';
-COMMENT ON COLUMN js_sys_msg_push_wait.msg_type IS '消息类型（PC APP 短信 邮件 微信）';
-COMMENT ON COLUMN js_sys_msg_push_wait.msg_title IS '消息标题';
-COMMENT ON COLUMN js_sys_msg_push_wait.msg_content IS '消息内容';
-COMMENT ON COLUMN js_sys_msg_push_wait.biz_key IS '业务主键';
-COMMENT ON COLUMN js_sys_msg_push_wait.biz_type IS '业务类型';
-COMMENT ON COLUMN js_sys_msg_push_wait.receive_code IS '接受者账号';
-COMMENT ON COLUMN js_sys_msg_push_wait.receive_user_code IS '接受者用户编码';
-COMMENT ON COLUMN js_sys_msg_push_wait.receive_user_name IS '接受者用户姓名';
-COMMENT ON COLUMN js_sys_msg_push_wait.send_user_code IS '发送者用户编码';
-COMMENT ON COLUMN js_sys_msg_push_wait.send_user_name IS '发送者用户姓名';
-COMMENT ON COLUMN js_sys_msg_push_wait.send_date IS '发送时间';
-COMMENT ON COLUMN js_sys_msg_push_wait.is_merge_push IS '是否合并推送';
-COMMENT ON COLUMN js_sys_msg_push_wait.plan_push_date IS '计划推送时间';
-COMMENT ON COLUMN js_sys_msg_push_wait.push_number IS '推送尝试次数';
-COMMENT ON COLUMN js_sys_msg_push_wait.push_return_content IS '推送返回的内容信息';
-COMMENT ON COLUMN js_sys_msg_push_wait.push_return_code IS '推送返回结果码';
-COMMENT ON COLUMN js_sys_msg_push_wait.push_return_msg_id IS '推送返回消息编号';
-COMMENT ON COLUMN js_sys_msg_push_wait.push_status IS '推送状态（0未推送 1成功  2失败）';
-COMMENT ON COLUMN js_sys_msg_push_wait.push_date IS '推送时间';
-COMMENT ON COLUMN js_sys_msg_push_wait.read_status IS '读取状态（0未送达 1未读 2已读）';
-COMMENT ON COLUMN js_sys_msg_push_wait.read_date IS '读取时间';
+COMMENT ON TABLE js_sys_msg_pushed IS '消息已推送表';
+COMMENT ON COLUMN js_sys_msg_pushed.id IS '编号';
+COMMENT ON COLUMN js_sys_msg_pushed.msg_type IS '消息类型（PC APP 短信 邮件 微信）';
+COMMENT ON COLUMN js_sys_msg_pushed.msg_title IS '消息标题';
+COMMENT ON COLUMN js_sys_msg_pushed.msg_content IS '消息内容';
+COMMENT ON COLUMN js_sys_msg_pushed.biz_key IS '业务主键';
+COMMENT ON COLUMN js_sys_msg_pushed.biz_type IS '业务类型';
+COMMENT ON COLUMN js_sys_msg_pushed.receive_code IS '接受者账号';
+COMMENT ON COLUMN js_sys_msg_pushed.receive_user_code IS '接受者用户编码';
+COMMENT ON COLUMN js_sys_msg_pushed.receive_user_name IS '接受者用户姓名';
+COMMENT ON COLUMN js_sys_msg_pushed.send_user_code IS '发送者用户编码';
+COMMENT ON COLUMN js_sys_msg_pushed.send_user_name IS '发送者用户姓名';
+COMMENT ON COLUMN js_sys_msg_pushed.send_date IS '发送时间';
+COMMENT ON COLUMN js_sys_msg_pushed.is_merge_push IS '是否合并推送';
+COMMENT ON COLUMN js_sys_msg_pushed.plan_push_date IS '计划推送时间';
+COMMENT ON COLUMN js_sys_msg_pushed.push_number IS '推送尝试次数';
+COMMENT ON COLUMN js_sys_msg_pushed.push_return_content IS '推送返回的内容信息';
+COMMENT ON COLUMN js_sys_msg_pushed.push_return_code IS '推送返回结果码';
+COMMENT ON COLUMN js_sys_msg_pushed.push_return_msg_id IS '推送返回消息编号';
+COMMENT ON COLUMN js_sys_msg_pushed.push_status IS '推送状态（0未推送 1成功  2失败）';
+COMMENT ON COLUMN js_sys_msg_pushed.push_date IS '推送时间';
+COMMENT ON COLUMN js_sys_msg_pushed.read_status IS '读取状态（0未送达 1未读 2已读）';
+COMMENT ON COLUMN js_sys_msg_pushed.read_date IS '读取时间';
 COMMENT ON TABLE js_sys_msg_template IS '消息模板';
 COMMENT ON COLUMN js_sys_msg_template.id IS '编号';
 COMMENT ON COLUMN js_sys_msg_template.module_code IS '归属模块';

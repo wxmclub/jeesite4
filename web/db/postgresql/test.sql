@@ -63,12 +63,12 @@ CREATE TABLE test_tree
 (
 	tree_code varchar(64) NOT NULL,
 	parent_code varchar(64) NOT NULL,
-	parent_codes varchar(2000) NOT NULL,
+	parent_codes varchar(1000) NOT NULL,
 	tree_sort decimal(10) NOT NULL,
-	tree_sorts varchar(1200) NOT NULL,
+	tree_sorts varchar(1000) NOT NULL,
 	tree_leaf char(1) NOT NULL,
 	tree_level decimal(4) NOT NULL,
-	tree_names varchar(2000) NOT NULL,
+	tree_names varchar(1000) NOT NULL,
 	tree_name varchar(200) NOT NULL,
 	status char(1) DEFAULT '0' NOT NULL,
 	create_by varchar(64) NOT NULL,
@@ -94,7 +94,7 @@ COMMENT ON COLUMN test_data.test_checkbox IS '复选框';
 COMMENT ON COLUMN test_data.test_date IS '日期选择';
 COMMENT ON COLUMN test_data.test_datetime IS '日期时间';
 COMMENT ON COLUMN test_data.test_user_code IS '用户选择';
-COMMENT ON COLUMN test_data.test_office_code IS '部门选择';
+COMMENT ON COLUMN test_data.test_office_code IS '机构选择';
 COMMENT ON COLUMN test_data.test_area_code IS '区域选择';
 COMMENT ON COLUMN test_data.test_area_name IS '区域名称';
 COMMENT ON COLUMN test_data.status IS '状态（0正常 1删除 2停用）';
@@ -116,7 +116,7 @@ COMMENT ON COLUMN test_data_child.test_checkbox IS '复选框';
 COMMENT ON COLUMN test_data_child.test_date IS '日期选择';
 COMMENT ON COLUMN test_data_child.test_datetime IS '日期时间';
 COMMENT ON COLUMN test_data_child.test_user_code IS '用户选择';
-COMMENT ON COLUMN test_data_child.test_office_code IS '部门选择';
+COMMENT ON COLUMN test_data_child.test_office_code IS '机构选择';
 COMMENT ON COLUMN test_data_child.test_area_code IS '区域选择';
 COMMENT ON COLUMN test_data_child.test_area_name IS '区域名称';
 COMMENT ON TABLE test_tree IS '测试树表';

@@ -11,6 +11,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 
 import com.jeesite.common.codec.EncodeUtils;
 import com.jeesite.common.lang.ObjectUtils;
+import com.jeesite.common.utils.SpringUtils;
 import com.jeesite.common.web.http.ServletUtils;
 import com.jeesite.modules.sys.entity.EmpUser;
 import com.jeesite.modules.sys.entity.Log;
@@ -45,7 +46,7 @@ public class AuthorizingRealm extends com.jeesite.common.shiro.realm.BaseAuthori
 				.decodeUrl(ObjectUtils.toString(attributes.get("companyCode"))));
 		empUser.getEmployee().getOffice().setOfficeCode(EncodeUtils
 				.decodeUrl(ObjectUtils.toString(attributes.get("officeCode"))));
-		empUserService.save(empUser);
+		getEmpUserService().save(empUser);
 	}
 	
 	@Override
@@ -55,24 +56,30 @@ public class AuthorizingRealm extends com.jeesite.common.shiro.realm.BaseAuthori
 		User user = UserUtils.getUser();
 		
 		// 更新登录IP、时间、会话ID等
-		userService.updateUserLoginInfo(user);
+		getUserService().updateUserLoginInfo(user);
 		
 		// 记录用户登录日志
-		LogUtils.saveLog(ServletUtils.getRequest(), "系统登录", Log.TYPE_LOGIN_LOGOUT);
+		LogUtils.saveLog(user, ServletUtils.getRequest(), "系统登录", Log.TYPE_LOGIN_LOGOUT);
 	}
 	
 	@Override
 	public void onLogoutSuccess(User logoutUser, HttpServletRequest request) {
 		// 记录用户退出日志
-		LogUtils.saveLog(logoutUser, request, null, null, "系统退出", Log.TYPE_LOGIN_LOGOUT);
-	}
-	
-	public void setUserService(UserService userService) {
-		this.userService = userService;
+		LogUtils.saveLog(logoutUser, request, "系统退出", Log.TYPE_LOGIN_LOGOUT);
 	}
 
-	public void setEmpUserService(EmpUserService empUserService) {
-		this.empUserService = empUserService;
+	public UserService getUserService() {
+		if (userService == null){
+			userService = SpringUtils.getBean(UserService.class);
+		}
+		return userService;
+	}
+
+	public EmpUserService getEmpUserService() {
+		if (empUserService == null){
+			empUserService = SpringUtils.getBean(EmpUserService.class);
+		}
+		return empUserService;
 	}
 	
 }

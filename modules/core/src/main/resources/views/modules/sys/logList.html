@@ -33,7 +33,7 @@
 				<div class="form-group">
 					<label class="control-label">操作用户：</label>
 					<div class="control-inline width-120">
-						<#form:listselect id="userSelect" title="用户" path="createBy"
+						<#form:listselect id="userSelect" title="用户选择" path="createBy"
 							url="${ctx}/sys/user/userSelect?userType=" allowClear="false" 
 							checkbox="false" itemCode="userCode" itemName="userName"/>
 					</div>
@@ -109,7 +109,8 @@ $('#dataGrid').dataGrid({
 		{header:'操作时间', name:'createDate', index:'a.create_date', width:100, align:"center"},
 		{header:'客户端IP', name:'remoteAddr', index:'a.remote_addr', width:100, align:"center"},
 		{header:'设备名称', name:'deviceName', index:'a.device_name', width:100, align:"center"},
-		{header:'浏览器名', name:'browserName', index:'a.browser_name', width:100, align:"center"}/* ,
+		{header:'浏览器名', name:'browserName', index:'a.browser_name', width:100, align:"center"},
+		{header:'响应时间', name:'executeTimeFormat', index:'a.execute_time', width:100, align:"center"}/* ,
 		{header:'操作', name:'actions', width:130, sortable:false, title:false, formatter: function(val, obj, row, act){
 			var actions = [];
 			<% if(hasPermi('sys:log:edit')){ %>

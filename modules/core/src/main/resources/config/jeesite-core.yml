@@ -1,3 +1,19 @@
+# 温馨提示：不建议直接修改此文件，为了平台升级方便，建议将需要修改的参数值，复制到jeesite.yml里进行覆盖该参数值。
+
+#============================#
+#===== Project settings =====#
+#============================#
+
+# 产品或项目名称、版本、版权年份
+productName: JeeSite Demo
+productVersion: V4.0
+copyrightYear: 2018
+
+# 软件提供商公司或个人名称
+companyName: ThinkGem
+
+#是否演示模式
+demoMode: false
 
 #============================#
 #===== Database sttings =====#
@@ -9,31 +25,31 @@ jdbc:
 #  # Mysql 数据库配置
 #  type: mysql
 #  driver: com.mysql.jdbc.Driver
-#  url: jdbc:mysql://127.0.0.1:3306/jeesite4?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+#  url: jdbc:mysql://127.0.0.1:3306/jeesite?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
 #  username: root
 #  password: 123456
 #  testSql: SELECT 1
-
-  # Oracle 数据库配置
+#
+#  # Oracle 数据库配置
 #  type: oracle
 #  driver: oracle.jdbc.driver.OracleDriver
 #  url: jdbc:oracle:thin:@127.0.0.1:1521/orcl
 #  username: jeesite
 #  password: jeesite
 #  testSql: SELECT 1 FROM DUAL
-
-  # Sql Server 数据库配置
+#
+#  # Sql Server 数据库配置
 #  type: mssql
 #  driver: net.sourceforge.jtds.jdbc.Driver
 #  url: jdbc:jtds:sqlserver://127.0.0.1:1433/jeesite
 #  username: jeesite
 #  password: jeesite
 #  testSql: SELECT 1
-  
-  # PostgreSql 数据库配置
+#  
+#  # PostgreSql 数据库配置（注意：一定要创建的schema与username相同，否则将找不到数据表字典信息）
 #  type: postgresql
 #  driver: org.postgresql.Driver
-#  url: jdbc:postgresql://localhost:5432/jeesite
+#  url: jdbc:postgresql://127.0.0.1:5432/jeesite
 #  username: jeesite
 #  password: jeesite
 #  testSql: SELECT 1
@@ -56,7 +72,7 @@ jdbc:
     # 最大连接数
     maxActive: 20
 
-#  # 多数数据源名称列表，调用方式：DataSourceHolder.setDataSourceName("ds2")
+#  # 多数据源名称列表，启用方式：@MyBatisDao(dataSourceName="ds2")
 #  dataSourceNames: ds2
 #  
 #  # 多数据源配置：ds2
@@ -66,7 +82,7 @@ jdbc:
 #    url: jdbc:oracle:thin:@127.0.0.1:1521/orcl
 #    username: jeesite
 #    password: jeesite
-#    testSql: ~
+#    testSql: SELECT 1 FROM DUAL
 #    encrypt:
 #      username: false
 #      password: true
@@ -93,30 +109,22 @@ redis:
   timeout: 2000
   password: 1234
   database: 0
+  clientName: ~
   
   # Redis 连接池配置
   pool:
     maxIdle: 3
     maxTotal: 20
+
+  # 是否启用Redis系统缓存及会话
+  cacheAndSession: false
   
   # 定义Key的前缀标识
   keyPrefix: ${jdbc.tablePrefix}
 
-  # 是否启用Redis系统缓存及会话
-  cacheAndSession: false
-
 #============================#
 #===== System settings ======#
 #============================#
-
-#产品信息设置
-productName: JeeSite Demo
-productVersion: V4.0
-copyrightYear: 2018
-companyName: ThinkGem
-
-#是否演示模式
-demoMode: false
 
 #管理基础路径
 adminPath: /a
@@ -158,7 +166,8 @@ user:
     [{
       moduleCode: "core",
       ctrlPermi: "0",
-      ctrlName: "部门权限",
+      ctrlName: "机构权限",
+      ctrlName_en: "Office",
       ctrlType: "Office",
       ctrlDataUrl: "/sys/office/treeData",
       chkboxType: {"Y":"ps","N":"ps"},
@@ -167,6 +176,7 @@ user:
     },{
       moduleCode: "core",
       ctrlName: "公司权限",
+      ctrlName_en: "Company",
       ctrlType: "Company",
       ctrlPermi: "0",
       ctrlDataUrl: "/sys/company/treeData",
@@ -176,6 +186,7 @@ user:
     },{
       moduleCode: "core",
       ctrlName: "角色权限",
+      ctrlName_en: "Role",
       ctrlType: "Role",
       ctrlPermi: "2",
       ctrlDataUrl: "/sys/role/treeData",
@@ -259,7 +270,7 @@ shiro:
   isAllowExternalSiteIframe: true
   
   # 是否允许跨域访问，如果允许，设置允许的域名，全部域名设置*号，如果不允许，此设置应该为空
-#  accessControlAllowOrigin: http://demo.jeesite.com
+#  accessControlAllowOrigin: http://demo.jeesite.net
 #  accessControlAllowOrigin: '*'
   
   # URI 权限过滤器定义
@@ -401,13 +412,13 @@ file:
   # 上传文件的相对路径（支持：yyyy, MM, dd, HH, mm, ss, E）
   uploadPath: '{yyyy}{MM}/'
   
-  # 上传单个文件最大字节（500M），在这之上还有 > Tomcat限制 > Nginx限制，等。
+  # 上传单个文件最大字节（500M），在这之上还有 > Tomcat限制 > Nginx限制，等，此设置会覆盖 spring.http.multipart.maxFileSize 设置
   maxFileSize: 500*1024*1024
   
   #设置允许上传的文件后缀
   imageAllowSuffixes: .gif,.bmp,.jpeg,.jpg,.ico,.png,.tif,.tiff,
   mediaAllowSuffixes: .flv,.swf,.mkv,webm,.mid,.mov,.mp3,.mp4,.m4v,.mpc,.mpeg,.mpg,.swf,.wav,.wma,.wmv,.avi,.rm,.rmi,.rmvb,.aiff,.asf,.ogg,.ogv,
-  fileAllowSuffixes: .doc,.docx,.rtf,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.vsd,.txt,.md,.xml,.rar,.zip,7z,.tar,.tgz,.jar,.gz,.gzip,.bz2,.cab,.iso,
+  fileAllowSuffixes: .doc,.docx,.rtf,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.vsd,.txt,.md,.xml,.rar,.zip,7z,.tar,.tgz,.jar,.gz,.gzip,.bz2,.cab,.iso,.ipa,.apk,
   
   #允许上传的文件内容类型（图片、word、excel、ppt）防止修改后缀恶意上传文件（默认不启用验证）
 #  allowContentTypes: image/jpeg,image/gif,image/bmp,image/png,image/x-png,
